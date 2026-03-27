@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codex Words</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <p class="eyebrow">Codex Words</p>
+        <h1>Treino de vocabulario, audio e repeticao inteligente</h1>
+        <p class="sidebar-copy">
+          Cadastre grupos, grave a pronuncia, responda digitando e acompanhe o desempenho no dashboard.
+        </p>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Navegacao principal">
+        <button class="nav-tab active" data-view="cadastro">Cadastro</button>
+        <button class="nav-tab" data-view="estudo">Estudo</button>
+        <button class="nav-tab" data-view="dashboard">Dashboard</button>
+      </nav>
+
+      <section class="sidebar-panel">
+        <h2>Regras do automatico</h2>
+        <ul>
+          <li>Palavras novas aparecem mais.</li>
+          <li>Palavras antigas com muitos acertos passam a aparecer menos.</li>
+          <li>O dashboard mostra taxa de acerto e chance de aparicao.</li>
+        </ul>
+      </section>
+
+      <section class="sidebar-panel">
+        <h2>Seu ritmo</h2>
+        <div class="sidebar-stats">
+          <div class="sidebar-stat">
+            <span>Streak</span>
+            <strong id="sidebar-streak-display">0 dias</strong>
+          </div>
+          <div id="sidebar-rounds-card" class="sidebar-stat">
+            <span>Rodadas hoje</span>
+            <strong id="sidebar-rounds-display">0/4</strong>
+            <small id="sidebar-goal-status">Meta do dia pendente</small>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <main class="main-content">
+      <section id="cadastro-view" class="view active">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Modo 1</p>
+            <h2>Cadastro de grupos e palavras</h2>
+          </div>
+          <button id="new-group-btn" class="primary-btn">Novo grupo</button>
+        </header>
+
+        <div class="layout-grid">
+          <section class="card">
+            <div class="card-header">
+              <h3>Grupos</h3>
+              <span id="group-count" class="counter">0 grupos</span>
+            </div>
+            <div id="group-list" class="group-list empty-state-box">Nenhum grupo criado ainda.</div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <div>
+                <h3 id="editor-title">Selecione um grupo</h3>
+                <p id="editor-subtitle" class="panel-muted">Escolha um grupo na lista para adicionar palavras.</p>
+              </div>
+            </div>
+
+            <form id="word-form" class="word-form">
+              <label>Portugues
+                <input type="text" id="pt-input" placeholder="Ex.: casa" required>
+              </label>
+              <label>Ingles
+                <input type="text" id="en-input" placeholder="Ex.: house" required>
+              </label>
+              <label>Fonetica / ajuda de pronuncia
+                <input type="text" id="phonetic-input" placeholder="Ex.: rraus">
+              </label>
+
+              <div class="audio-box">
+                <div class="audio-actions">
+                  <button type="button" id="record-btn" class="secondary-btn" disabled>Gravar audio</button>
+                  <button type="button" id="stop-btn" class="secondary-btn" disabled>Parar</button>
+                  <button type="button" id="play-recording-btn" class="secondary-btn" disabled>Ouvir gravacao</button>
+                  <button type="button" id="clear-recording-btn" class="ghost-btn" disabled>Limpar audio</button>
+                </div>
+                <p id="recording-status" class="panel-muted">Selecione um grupo para habilitar a gravacao.</p>
+              </div>
+
+              <div class="audio-actions">
+                <button type="submit" id="save-word-btn" class="primary-btn" disabled>Salvar palavra</button>
+                <button type="button" id="cancel-edit-btn" class="ghost-btn" disabled>Cancelar edicao</button>
+              </div>
+            </form>
+          </section>
+        </div>
+
+        <section class="card full-width">
+          <div class="card-header">
+            <h3>Palavras do grupo</h3>
+            <span id="word-count" class="counter">0 palavras</span>
+          </div>
+          <div id="word-list" class="word-list empty-state-box">Nenhum grupo selecionado.</div>
+        </section>
+      </section>
+
+      <section id="estudo-view" class="view">
+        <div class="study-layout">
+          <section class="card study-board">
+            <div class="study-board-header">
+              <div class="study-board-tools">
+                <button id="open-study-settings-btn" class="icon-btn" type="button" aria-label="Abrir configuracoes do estudo">&#9881;</button>
+                <div class="stat-chip">
+                  <span>Tempo</span>
+                  <strong id="timer-display">--</strong>
+                </div>
+                <div class="stat-chip">
+                  <span>Placar</span>
+                  <strong id="score-display">0 / 0</strong>
+                </div>
+                <button id="start-study-btn" class="primary-btn">Comecar estudo</button>
+              </div>
+            </div>
+
+            <p id="study-summary" class="study-summary-banner panel-muted">Monte sua rodada e comece quando quiser.</p>
+            <div id="study-top-feedback" class="study-top-feedback hidden">
+              <div id="study-top-result" class="study-top-result panel-muted">Nenhum resultado ainda.</div>
+              <div class="study-top-actions">
+                <button id="audio-answer-btn" class="secondary-btn" disabled>Ouvir audio</button>
+                <button id="next-card-btn" class="primary-btn" disabled>Proxima palavra</button>
+              </div>
+            </div>
+
+            <div id="study-card" class="study-card empty">
+              <p class="panel-muted">Nenhuma rodada iniciada.</p>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="dashboard-view" class="view">
+        <header class="section-header">
+          <div>
+            <p class="eyebrow">Modo 3</p>
+            <h2>Dashboard de desempenho</h2>
+          </div>
+        </header>
+
+        <div class="dashboard-grid">
+          <section class="card">
+            <div class="card-header">
+              <h3>Configuracao das metricas</h3>
+            </div>
+            <div class="study-options">
+              <label>Quantidade de aparicoes usadas no percentual de acerto
+                <input type="number" id="accuracy-window-input" min="5" max="100" step="1" value="20">
+              </label>
+              <label>Meta diaria de rodadas para contar no streak
+                <input type="number" id="daily-round-goal-input" min="1" max="20" step="1" value="4">
+              </label>
+              <p class="panel-muted">O percentual de acerto de cada palavra passa a olhar so para as ultimas N respostas.</p>
+              <button id="reset-all-stats-btn" type="button" class="ghost-btn">Resetar estatisticas gerais</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <h3>Visao geral</h3>
+            </div>
+            <div id="dashboard-summary" class="stats-grid"></div>
+          </section>
+
+          <section class="card">
+            <div class="card-header">
+              <h3>Palavras monitoradas</h3>
+              <span id="dashboard-count" class="counter">0 palavras</span>
+            </div>
+            <div id="dashboard-word-list" class="dashboard-list empty-state-box">Adicione palavras para acompanhar as metricas.</div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="group-dialog">
+    <form method="dialog" id="group-form" class="dialog-form">
+      <div class="dialog-header">
+        <h3>Novo grupo</h3>
+        <button type="submit" class="ghost-btn">Fechar</button>
+      </div>
+
+      <label>Nome do grupo
+        <input type="text" id="group-name-input" placeholder="Ex.: Verbos basicos" required>
+      </label>
+
+      <label>Descricao
+        <textarea id="group-description-input" rows="3" placeholder="Ex.: palavras para treino da semana"></textarea>
+      </label>
+
+      <button type="button" id="save-group-btn" class="primary-btn">Salvar grupo</button>
+    </form>
+  </dialog>
+
+  <dialog id="study-settings-dialog">
+    <form method="dialog" id="study-settings-form" class="dialog-form">
+      <div class="dialog-header">
+        <h3>Configuracoes do estudo</h3>
+        <button type="submit" class="ghost-btn">Fechar</button>
+      </div>
+
+      <div class="study-mode-picker">
+        <label class="radio-card">
+          <input type="radio" name="study-mode" value="manual" checked>
+          <span>
+            <strong>Manual</strong>
+            <small>Voce escolhe os grupos usados na rodada.</small>
+          </span>
+        </label>
+
+        <label class="radio-card">
+          <input type="radio" name="study-mode" value="automatic">
+          <span>
+            <strong>Automatico inteligente</strong>
+            <small>Mais repeticao para palavras menos dominadas.</small>
+          </span>
+        </label>
+
+        <label class="radio-card">
+          <input type="radio" name="study-mode" value="review">
+          <span>
+            <strong>Revisao de erros</strong>
+            <small>Foca nas palavras que voce errou recentemente.</small>
+          </span>
+        </label>
+      </div>
+
+      <div id="manual-selection-box">
+        <h4>Grupos para estudar</h4>
+        <div id="study-group-list" class="checkbox-list empty-state-box">Crie grupos no cadastro para poder estudar.</div>
+      </div>
+
+      <div class="study-options">
+        <label>Pergunta mostrada na tela
+          <select id="prompt-direction">
+            <option value="pt-en">Mostrar Portugues, responder Ingles</option>
+            <option value="en-pt">Mostrar Ingles, responder Portugues</option>
+            <option value="mixed">Misturar os dois lados</option>
+          </select>
+        </label>
+
+        <label>Tempo por pergunta (segundos)
+          <input type="number" id="timer-input" min="0" step="5" value="20">
+        </label>
+
+        <label>Meta de acertos na rodada
+          <input type="number" id="round-size-input" min="1" max="50" value="10">
+        </label>
+
+        <label>Maximo de tentativas na rodada
+          <input type="number" id="max-attempts-input" min="1" max="100" value="20">
+        </label>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
